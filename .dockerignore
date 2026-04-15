@@ -1,0 +1,10 @@
+**/node_modules
+**/__pycache__
+**/.pytest_cache
+**/*.pyc
+.git
+frontend/test_raw_image
+backend/data
+backend/output
+backend/reconstruct/data
+backend/LLM_conversation.db

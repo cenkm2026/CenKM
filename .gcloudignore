@@ -1,0 +1,11 @@
+.git
+.gitignore
+**/node_modules/**
+**/__pycache__/**
+**/*.pyc
+frontend/build/**
+frontend/test_raw_image/**
+backend/data/**
+backend/output/**
+backend/reconstruct/data/**
+backend/LLM_conversation.db

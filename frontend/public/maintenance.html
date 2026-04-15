@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>We'll be back soon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <style>
+    :root{--bg:#0b1020;--card:#111832;--fg:#e8eefc;--mut:#92a1c6;--pri:#5b8cff}
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0; font:16px/1.5 system-ui,Segoe UI,Roboto,Helvetica,Arial; color:var(--fg); background:radial-gradient(1200px 600px at 80% -10%, #1a2455 0%, #0b1020 60%);}
+    .wrap{min-height:100%; display:grid; place-items:center; padding:32px}
+    .card{width:min(920px,96vw); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.1); border-radius:28px; padding:40px; box-shadow:0 8px 40px rgba(0,0,0,.35)}
+    h1{margin:0 0 8px; font-size:34px}
+    p{margin:6px 0; color:var(--mut)}
+    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:16px}
+    .pill{padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); color:#cfe0ff}
+    .cta{margin-left:auto}
+    .btn{background:var(--pri); color:#fff; border:none; padding:10px 14px; border-radius:12px; font-weight:600; cursor:pointer}
+    .timer{
+        display:flex;
+        justify-content:center;  
+        align-items:stretch;
+        gap:14px;
+        margin:20px auto 10px;   
+        width:fit-content;      
+        }
+    .t{min-width:64px; text-align:center; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); padding:10px 8px; border-radius:12px}
+    small{color:#8fa5d9}
+    form{display:flex; gap:8px; margin-top:14px}
+    input{flex:1; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.16); background:#0f1530; color:#e8eefc}
+    .hint{margin-top:8px; font-size:12px; color:#899bcf}
+    a.btn{
+        text-decoration: none;
+        display: inline-block; 
+        }
+        a.btn:hover,
+        a.btn:focus{
+        text-decoration: none;
+        outline: 2px solid rgba(255,255,255,.35); 
+        outline-offset: 2px;
+        }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card" role="status" aria-live="polite">
+      <h1>🚧 Scheduled maintenance</h1>
+      <p>We’re upgrading CEN-KM services to improve stability and accuracy. Thanks for your patience!</p>
+
+      <div class="timer" id="timer" hidden>
+        <div class="t"><div id="d">00</div><small>days</small></div>
+        <div class="t"><div id="h">00</div><small>hours</small></div>
+        <div class="t"><div id="m">00</div><small>mins</small></div>
+        <div class="t"><div id="s">00</div><small>secs</small></div>
+      </div>
+
+      <div class="row">
+        <span class="pill">Status: <strong id="status">Maintenance</strong></span>
+        <span class="pill">Last update: <span id="stamp"></span></span>
+        <div class="cta"><a class="btn" href="mailto:yanxun.xu@jhu.edu">Contact</a></div>
+      </div>
+
+      <form id="notify" onsubmit="subscribe(event)">
+        <input type="email" id="mail" placeholder="Email for re-open notice" aria-label="Email"/>
+        <button class="btn" type="submit">Notify me</button>
+      </form>
+      <div class="hint">We never share your email. You’ll get one message when the site is back.</div>
+    </section>
+  </main>
+
+    <script>
+    const $ = id => document.getElementById(id);
+
+    // 1) 显示“最后更新时间�?
+    $('stamp').textContent = new Date().toLocaleString();
+
+    // 2) 从后�?静态文件获取维护状�?
+    const STATUS_URL = '/__maint/status.json';   // �?下面网关会提供这�?
+    fetch(STATUS_URL, { cache: 'no-store' })
+        .then(r => r.ok ? r.json() : Promise.reject(r.status))
+        .then(status => {
+        // 可选字�? maintenance(bool), eta(ISO), message, contact, last_update
+        if (status.message) {
+            const p = document.querySelector('.card p'); // 副标题那�?
+            if (p) p.textContent = status.message;
+        }
+        if (status.contact) {
+            const a = document.querySelector('.btn[href^="mailto:"]');
+            if (a) a.href = 'mailto:' + status.contact;
+        }
+        if (status.last_update) $('stamp').textContent = new Date(status.last_update).toLocaleString();
+
+        if (status.eta) {
+            const deadline = new Date(status.eta).getTime();
+            $('timer').hidden = false;
+            const tick = () => {
+            const diff = Math.max(0, deadline - Date.now());
+            const d = Math.floor(diff/86400000);
+            const h = Math.floor(diff%86400000/3600000);
+            const m = Math.floor(diff%3600000/60000);
+            const s = Math.floor(diff%60000/1000);
+            $('d').textContent = String(d).padStart(2,'0');
+            $('h').textContent = String(h).padStart(2,'0');
+            $('m').textContent = String(m).padStart(2,'0');
+            $('s').textContent = String(s).padStart(2,'0');
+            };
+            tick(); setInterval(tick, 1000);
+        } else {
+            // �?ETA 就隐藏计时器
+            $('timer').hidden = true;
+        }
+        })
+        .catch(() => {
+        // 兜底：取不到就不显示计时�?
+        $('timer').hidden = true;
+        });
+
+    // 可选：订阅回调（仍然本地弹窗，换成你后端接口即可）
+    function subscribe(e){
+        e.preventDefault();
+        const v = document.getElementById('mail').value.trim();
+        if(!v) return;
+        // TODO: fetch('/api/notify', {method:'POST', body: JSON.stringify({email:v})})
+        alert('Thanks! We will notify ' + v);
+        document.getElementById('mail').value = '';
+    }
+    window.subscribe = subscribe; // 保留�?onsubmit
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,21 @@
+/* -------- Global Custom Scrollbar -------- */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  backdrop-filter: blur(4px);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(78, 124, 255, 0.55); /* theme.primary */
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,0.15);
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(109, 141, 255, 0.85); /* theme.primaryHover */
+}

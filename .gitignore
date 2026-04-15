@@ -1,0 +1,61 @@
+# ---------------------------
+# OS / Editor
+# ---------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ---------------------------
+# Python
+# ---------------------------
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+*.log
+.venv/
+venv/
+env/
+
+# ---------------------------
+# Backend runtime/generated
+# ---------------------------
+backend/data/
+backend/output/
+backend/reconstruct/data/
+backend/LLM_conversation.db
+backend/.ipynb_checkpoints/
+backend/plot_digitizer/data/
+
+# Optional large/test artifacts
+backend/test_data/
+backend/*.png_raw.png
+
+# ---------------------------
+# Node / Frontend
+# ---------------------------
+frontend/node_modules/
+frontend/build/
+frontend/.eslintcache
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Frontend temporary/raw assets
+frontend/test_raw_image/
+
+# ---------------------------
+# Archives / binaries
+# ---------------------------
+*.zip
+*.tar
+*.gz
+*.7z
+
+# ---------------------------
+# Keep example env template only
+# ---------------------------
+.env
+.env.*
+!.env.example
